@@ -8,6 +8,7 @@
 
 #define T_NUMBER 1001
 #define T_OPERATOR 1002
+#define T_VARIABLE 1003
 
 int token;          // Here we store the current token/literal
 int old_token = -1; // Sometimes we need to check the previous token
@@ -82,6 +83,7 @@ void MatchSymbol(int expected_token) {
     rd_syntax_error(expected_token, token,
                     "token %d expected, but %d was read");
   }
+  rd_lex();
 }
 
 #define ParseLParen()                                                          \
@@ -95,18 +97,80 @@ int ParseNumber() // Parsing Non Terminals and some Tokens require more
   MatchSymbol(T_NUMBER);
   return number;
 }
-
-int ParseAxiom() {
-  int val;
-  MatchSymbol('('); // A := (R
-  val = ParseRest();
-  return val;
+int ParseVariable() // Parsing Non Terminals and some Tokens require more
+{                 // complex functions
+  MatchSymbol(T_VARIABLE);
+  return variable;
 }
 
-int ParseRest() {
+int ParseAxiom() { // A::(R|N
+  if (token ==T_NUMBER){
+    ParseNumber();
+    }else if(token == '('){
+      ParseLParen();
+      ParseRest();
+    else{
+      rd_syntax_error (token, 0, "Token %d was read, but a Number or a Left Parenthesis was expected");
+    }
+  
+}
+}
+
+int ParseRest() { // R::= =VE)|OPP)
   int val;
-  MatchSymbol('a');
-  val = ParseExpression();
+  if (token == '='){
+    MatchSymbol('=');
+    ParseVariable();
+    ParseExpression();
+    ParseRParen();
+  }
+  else{
+    switch (token){			// Expression_Rest derives in alternatives
+		case '+' :  			// requires checking FIRST(ExpressionRest))
+		case '-' :
+		case '*' :
+		case '/' :  
+			    	break ;
+		default :   rd_syntax_error (token, 0, "Token %d was read, but an Operator was expected");
+			     	break ;
+	}
+	rd_lex () ;//Avanzamos el token
+    ParseParameter();
+    ParseParameter();
+    ParseRParen();
+  }
+}
+int ParseParameter(){ //P::=V|E
+  if (token == T_VARIABLE){
+    ParseVariable();
+  }
+  else if{
+    ParseExpression();
+  }else{
+    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected");
+  }
+  
+}
+int ParseExpression() { // E::= (OPP)|N
+  if (token == T_NUMBER){
+    ParseNumber();
+  }
+  else if (token == '('){
+    ParseLParen();
+    switch (token){			
+		case '+' :  			
+		case '-' :
+		case '*' :
+		case '/' :  
+			    	break ;
+		default :   rd_syntax_error (token, 0, "Token %d was read, but an Operator was expected");
+			     	break ;
+    rd_lex () ;//Avanzamos el token
+    ParseParameter();
+    ParseParameter();
+    ParseRParen();
+  }
+}
 }
 
 int main(int argc, char **argv) {
