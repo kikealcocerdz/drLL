@@ -12,7 +12,8 @@
 
 int token;          // Here we store the current token/literal
 int old_token = -1; // Sometimes we need to check the previous token
-int number;         // The value of the number
+int number; // The value of the number
+char variable;
 int old_number = 0;
 int token_val; // or the arithmetic operator
 int old_token_val = -1;
