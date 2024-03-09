@@ -21,21 +21,6 @@ int old_token_val = -1;
 
 int line_counter = 1;
 
-int ParseExpression() {
-  int val;
-  val = ParseTerm();
-  while (token == '+' || token == '-') {
-    if (token == '+') {
-      MatchSymbol('+');
-      val = val + ParseTerm();
-    } else {
-      MatchSymbol('-');
-      val = val - ParseTerm();
-    }
-  }
-  return val;
-} // Prototype for forward reference
-
 void update_old_token() { // Sometimes we need to check the previous token
                           // TO DO: Change to a more structured code
   old_token = token;
@@ -93,28 +78,66 @@ void MatchSymbol(int expected_token) {
   MatchSymbol(')'); // rather than using functions
                     // This is only useful for matching Literals
 
-int ParseNumber() // Parsing Non Terminals and some Tokens require more
-{                 // complex functions
+
+int ParseExpression() { // E::= (OPP)|N
+  if (token == T_NUMBER){
+    int numberPrint = ParseNumber();
+    printf("%d", numberPrint);
+  }
+  else if (token == '('){
+    ParseLParen();
+    char operator = ParseOperator();
+    rd_lex () ;//Avanzamos el token
+    ParseParameter();
+    ParseParameter();
+    ParseRParen();
+  }
+}
+
+int ParseNumber() {                
   MatchSymbol(T_NUMBER);
   return number;
+
 }
-int ParseVariable() // Parsing Non Terminals and some Tokens require more
-{                 // complex functions
+int ParseVariable(){                 
   MatchSymbol(T_VARIABLE);
   return variable;
+
+}
+
+int ParseOperator() { // O::= +|-|*|/
+  MatchSymbol(T_OPERATOR);
+  return token_val;
+}
+
+
+int ParseParameter(){ //P::=V|E
+  if (token == T_VARIABLE){
+    char variablePrint = ParseVariable();
+    printf("%c", variablePrint);
+  }
+  else if(token == '(') {
+    ParseExpression();
+  }
+  else{
+    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected");
+  }
 }
 
 int ParseAxiom() { // A::(R|N
-  if (token ==T_NUMBER){
-    ParseNumber();
-    }else if(token == '('){
+  if (token == T_NUMBER){
+    int number = ParseNumber();
+    printf("%d", number);
+    }
+  else if(token == '('){
       ParseLParen();
       ParseRest();
+      printf("\n");
+    }
     else{
       rd_syntax_error (token, 0, "Token %d was read, but a Number or a Left Parenthesis was expected");
     }
-  
-}
+
 }
 
 int ParseRest() { // R::= =VE)|OPP)
@@ -126,53 +149,14 @@ int ParseRest() { // R::= =VE)|OPP)
     ParseRParen();
   }
   else{
-    switch (token){			// Expression_Rest derives in alternatives
-		case '+' :  			// requires checking FIRST(ExpressionRest))
-		case '-' :
-		case '*' :
-		case '/' :  
-			    	break ;
-		default :   rd_syntax_error (token, 0, "Token %d was read, but an Operator was expected");
-			     	break ;
-	}
-	rd_lex () ;//Avanzamos el token
+    char operatorPrint = ParseOperator();
     ParseParameter();
     ParseParameter();
+    printf("%c", operatorPrint);
     ParseRParen();
   }
 }
-int ParseParameter(){ //P::=V|E
-  if (token == T_VARIABLE){
-    ParseVariable();
-  }
-  else if{
-    ParseExpression();
-  }else{
-    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected");
-  }
-  
-}
-int ParseExpression() { // E::= (OPP)|N
-  if (token == T_NUMBER){
-    ParseNumber();
-  }
-  else if (token == '('){
-    ParseLParen();
-    switch (token){			
-		case '+' :  			
-		case '-' :
-		case '*' :
-		case '/' :  
-			    	break ;
-		default :   rd_syntax_error (token, 0, "Token %d was read, but an Operator was expected");
-			     	break ;
-    rd_lex () ;//Avanzamos el token
-    ParseParameter();
-    ParseParameter();
-    ParseRParen();
-  }
-}
-}
+
 
 int main(int argc, char **argv) {
   // Usage :  drLL -s  ==> evaluate a single Input Line
@@ -188,7 +172,7 @@ int main(int argc, char **argv) {
 
   do {
     rd_lex();
-    ParseAxion();
+    ParseAxiom();
     printf("\n");
   } while (flagMultiple);
 
