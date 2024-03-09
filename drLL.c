@@ -79,29 +79,17 @@ void MatchSymbol(int expected_token) {
                     // This is only useful for matching Literals
 
 
-int ParseExpression() { // E::= (OPP)|N
-  if (token == T_NUMBER){
-    int numberPrint = ParseNumber();
-    printf("%d ", numberPrint);
-}
-  else if (token == '('){
-    ParseLParen();
-    rd_lex () ;//Avanzamos el token
-    ParseParameter();
-    ParseParameter();
-    ParseRParen();
-  }
-}
 
-int ParseNumber() {                
+int ParseNumber() { 
+  int aux = number;  
   MatchSymbol(T_NUMBER);
-  return number;
-
+  return aux;
 }
-int ParseVariable(){                 
-  MatchSymbol(T_VARIABLE);
-  return variable;
 
+int ParseVariable(){  
+  char varaux = variable;               
+  MatchSymbol(T_VARIABLE);
+  return varaux;
 }
 
 int ParseOperator() { // O::= +|-|*|/
@@ -114,21 +102,32 @@ int ParseParameter(){ //P::=V|E
   if (token == T_VARIABLE){
     return ParseVariable();
   }
-  else if(token == T_NUMBER){
-    return ParseNumber();
-  }
-  else if(token == '(') {
+  else if(token == T_NUMBER || token == '('){ 
     ParseExpression();
-  }
+      }
   else{
-    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected");
+    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER");
+  }
+}
+
+int ParseExpression() { // E::= (OPP)|N
+  printf("entro en parseExpresion\n");
+
+  if (token == T_NUMBER){
+    ParseNumber();
+}
+  else if (token == '('){
+    ParseLParen();
+    ParseOperator();
+    ParseParameter();
+    ParseRParen();
   }
 }
 
 int ParseAxiom() { // A::(R|N
+
   if (token == T_NUMBER){
     int numberPrint = ParseNumber();
-    printf("%d ", numberPrint);
     }
   else if(token == '('){
       ParseLParen();
@@ -142,6 +141,7 @@ int ParseAxiom() { // A::(R|N
 }
 
 int ParseRest() { // R::= =VE)|OPP)
+  printf("entro en parseRest\n");
   int val;
   char parameter1;
   char parameter2;
@@ -161,6 +161,7 @@ int ParseRest() { // R::= =VE)|OPP)
     printf("%d %d %c ", parameter1, parameter2, operatorPrint);
   }
 }
+
 
 
 int main(int argc, char **argv) {
