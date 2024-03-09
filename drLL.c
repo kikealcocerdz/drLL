@@ -82,11 +82,10 @@ void MatchSymbol(int expected_token) {
 int ParseExpression() { // E::= (OPP)|N
   if (token == T_NUMBER){
     int numberPrint = ParseNumber();
-    printf("%d", numberPrint);
-  }
+    printf("%d ", numberPrint);
+}
   else if (token == '('){
     ParseLParen();
-    char operator = ParseOperator();
     rd_lex () ;//Avanzamos el token
     ParseParameter();
     ParseParameter();
@@ -113,8 +112,10 @@ int ParseOperator() { // O::= +|-|*|/
 
 int ParseParameter(){ //P::=V|E
   if (token == T_VARIABLE){
-    char variablePrint = ParseVariable();
-    printf("%c", variablePrint);
+    return ParseVariable();
+  }
+  else if(token == T_NUMBER){
+    return ParseNumber();
   }
   else if(token == '(') {
     ParseExpression();
@@ -126,8 +127,8 @@ int ParseParameter(){ //P::=V|E
 
 int ParseAxiom() { // A::(R|N
   if (token == T_NUMBER){
-    int number = ParseNumber();
-    printf("%d", number);
+    int numberPrint = ParseNumber();
+    printf("%d ", numberPrint);
     }
   else if(token == '('){
       ParseLParen();
@@ -142,6 +143,8 @@ int ParseAxiom() { // A::(R|N
 
 int ParseRest() { // R::= =VE)|OPP)
   int val;
+  char parameter1;
+  char parameter2;
   if (token == '='){
     MatchSymbol('=');
     ParseVariable();
@@ -150,10 +153,12 @@ int ParseRest() { // R::= =VE)|OPP)
   }
   else{
     char operatorPrint = ParseOperator();
-    ParseParameter();
-    ParseParameter();
-    printf("%c", operatorPrint);
+    parameter1 = ParseParameter();
+    if (parameter1 != 0){
+      parameter2 = ParseParameter();
+    }
     ParseRParen();
+    printf("%d %d %c ", parameter1, parameter2, operatorPrint);
   }
 }
 
