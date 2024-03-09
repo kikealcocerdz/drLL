@@ -45,6 +45,14 @@ int rd_lex() {
     return (token); // returns the Token for Number
   }
 
+  if (isalpha(c)) {
+    ungetc(c, stdin);
+    update_old_token();
+    scanf("%c", &variable);
+    token = T_VARIABLE;
+    return (token); // returns the Token for Variable
+  }
+
   if (c == '+' || c == '-' || c == '*' || c == '/') {
     update_old_token();
     token_val = c;
@@ -88,9 +96,9 @@ int ParseNumber() {
   return aux;
 }
 
-int ParseVariable(){  
+char ParseVariable(){  
   // printf("entro en parseVar\n");
-  char varaux = variable;               
+  char varaux = variable;   
   MatchSymbol(T_VARIABLE);
   return varaux;
 }
@@ -106,13 +114,15 @@ int ParseParameter(){ //P::=V|E
   // printf("entro en parseVar\n");
 
   if (token == T_VARIABLE){
-    return ParseVariable();
+    char paramVarAux = ParseVariable();
+    printf("%c ", paramVarAux);
+    printf("@ ");
   }
   else if(token == T_NUMBER || token == '('){ 
     ParseExpression();
       }
   else{
-    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER");
+    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER \n");
   }
 }
 
@@ -140,10 +150,11 @@ int ParseAxiom() { // A::(R|N
   else if(token == '('){
       ParseLParen();
       ParseRest();
+      printf(".");
       printf("\n");
     }
     else{
-      rd_syntax_error (token, 0, "Token %d was read, but a Number or a Left Parenthesis was expected");
+      rd_syntax_error (token, 0, "Token %d was read, but a Number or a Left Parenthesis was expected \n");
     }
 
 }
@@ -155,9 +166,11 @@ int ParseRest() { // R::= =VE)|OPP)
   char parameter2;
   if (token == '='){
     MatchSymbol('=');
-    ParseVariable();
+    char auxVar = ParseVariable();
     ParseExpression();
     ParseRParen();
+    printf("%c ", auxVar);
+    printf("! ");
   }
   else{
     char operatorPrint = ParseOperator();
@@ -166,7 +179,7 @@ int ParseRest() { // R::= =VE)|OPP)
       parameter2 = ParseParameter();
     }
     ParseRParen();
-    printf("%c", operatorPrint);
+    printf("%c ", operatorPrint);
   }
 }
 
