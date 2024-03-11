@@ -75,7 +75,7 @@ void rd_syntax_error(int expected, int token, char *output) {
 void MatchSymbol(int expected_token) {
   if (token != expected_token) {
     rd_syntax_error(expected_token, token,
-                    "token %d expected, but %d was read");
+                    "token %d expected, but %d was read in match_symbol\n");
   }
   rd_lex();
 }
@@ -89,7 +89,7 @@ void MatchSymbol(int expected_token) {
 
 
 int ParseNumber() { 
-  // printf("entro en parseNum\n");
+  //printf("entro en parseNum\n");
   int aux = number;  
   printf("%d ", aux);
   MatchSymbol(T_NUMBER);
@@ -97,21 +97,21 @@ int ParseNumber() {
 }
 
 char ParseVariable(){  
-  // printf("entro en parseVar\n");
+  //printf("entro en parseVar\n");
   char varaux = variable;   
   MatchSymbol(T_VARIABLE);
   return varaux;
 }
 
 int ParseOperator() { // O::= +|-|*|/
-  // printf("entro en parseOper\n");
+  //printf("entro en parseOper\n");
   MatchSymbol(T_OPERATOR);
   return token_val;
 }
 
 
 int ParseParameter(){ //P::=V|E
-  // printf("entro en parseVar\n");
+  //printf("entro en parseVar\n");
 
   if (token == T_VARIABLE){
     char paramVarAux = ParseVariable();
@@ -127,7 +127,7 @@ int ParseParameter(){ //P::=V|E
 }
 
 int ParseExpression() { // E::= (OPP)|N
-  // printf("entro en parseExpresion\n");
+  //printf("entro en parseExpresion\n");
 
   if (token == T_NUMBER){
     ParseNumber();
@@ -143,15 +143,15 @@ int ParseExpression() { // E::= (OPP)|N
 }
 
 int ParseAxiom() { // A::(R|N
-
+  //printf("entro en parseAxiom\n");
   if (token == T_NUMBER){
     int numberPrint = ParseNumber();
     }
   else if(token == '('){
       ParseLParen();
       ParseRest();
-      printf(".");
-      printf("\n");
+      ParseRParen();
+      
     }
     else{
       rd_syntax_error (token, 0, "Token %d was read, but a Number or a Left Parenthesis was expected \n");
@@ -165,20 +165,21 @@ int ParseRest() { // R::= =VE)|OPP)
   char parameter1;
   char parameter2;
   if (token == '='){
+    //printf("entro en if de parseRest\n");
     MatchSymbol('=');
     char auxVar = ParseVariable();
-    ParseExpression();
-    ParseRParen();
+    ParseAxiom();
+    
     printf("%c ", auxVar);
     printf("! ");
   }
   else{
+    //printf("entro en else de parseRest\n");
     char operatorPrint = ParseOperator();
     parameter1 = ParseParameter();
     if (parameter1 != 0){
       parameter2 = ParseParameter();
     }
-    ParseRParen();
     printf("%c ", operatorPrint);
   }
 }
@@ -200,6 +201,7 @@ int main(int argc, char **argv) {
   do {
     rd_lex();
     ParseAxiom();
+    printf(".");
     printf("\n");
   } while (flagMultiple);
 
