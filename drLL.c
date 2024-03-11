@@ -125,6 +125,17 @@ int ParseParameter(){ //P::=V|E
     rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER \n");
   }
 }
+int ParseParameterRest(char paramop){ // W::= WP| λ
+  if (token == T_VARIABLE || token == T_NUMBER || token == '('){
+    char paramVarAux = paramop;
+    ParseParameter();
+    printf("%c ", paramVarAux);
+    ParseParameterRest(token_val);
+  }
+  else{
+    return 0;
+  }
+};
 
 int ParseExpression() { // E::= (OPP)|N
   //printf("entro en parseExpresion\n");
@@ -134,15 +145,14 @@ int ParseExpression() { // E::= (OPP)|N
 }
   else if (token == '('){
     ParseLParen();
-    char auxoper = ParseOperator();
+    ParseOperator();
     ParseParameter();
-    ParseParameter();
+    ParseParameterRest(token_val);
     ParseRParen();
-    printf("%c ", auxoper);
   }
 }
 
-int ParseAxiom() { // A::(R|N
+int ParseAxiom() { // A::(R|N|V
   //printf("entro en parseAxiom\n");
   if (token == T_NUMBER){
     int numberPrint = ParseNumber();
@@ -151,6 +161,11 @@ int ParseAxiom() { // A::(R|N
       ParseLParen();
       ParseRest();
       ParseRParen();
+  }
+  else if(token == T_VARIABLE){
+    char paramVarAux = ParseVariable();
+    printf("%c ", paramVarAux);
+    printf("@ ");
       
     }
     else{
@@ -158,6 +173,7 @@ int ParseAxiom() { // A::(R|N
     }
 
 }
+
 
 int ParseRest() { // R::= =VE)|OPP)
   // printf("entro en parseRest\n");
@@ -170,17 +186,14 @@ int ParseRest() { // R::= =VE)|OPP)
     char auxVar = ParseVariable();
     ParseAxiom();
     
-    printf("%c ", auxVar);
+    printf("dup %c ", auxVar);
     printf("! ");
   }
   else{
     //printf("entro en else de parseRest\n");
-    char operatorPrint = ParseOperator();
-    parameter1 = ParseParameter();
-    if (parameter1 != 0){
-      parameter2 = ParseParameter();
-    }
-    printf("%c ", operatorPrint);
+    char aux=ParseOperator();
+    ParseParameter();
+    ParseParameterRest(aux);
   }
 }
 
@@ -203,6 +216,7 @@ int main(int argc, char **argv) {
     ParseAxiom();
     printf(".");
     printf("\n");
+    fflush(stdout);
   } while (flagMultiple);
 
   system("PAUSE");
