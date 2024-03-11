@@ -125,7 +125,7 @@ int ParseParameter(){ //P::=V|E
     rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER \n");
   }
 }
-int ParseParameterRest(char paramop){ // W::= WP| λ
+int ParseParameterRest(charparamop){ // W::= WP| λ
   if (token == T_VARIABLE || token == T_NUMBER || token == '('){
     char paramVarAux = paramop;
     ParseParameter();
