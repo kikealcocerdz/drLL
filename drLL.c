@@ -99,7 +99,7 @@ void MatchSymbol(int expected_token) {
 
 
 
-int ParseNumber() { 
+int ParseNumber() { // N::= 0|1|2|...|999...
   //printf("entro en parseNum\n");
   int aux = number;  
   printf("%d ", aux);
@@ -107,7 +107,7 @@ int ParseNumber() {
   return aux;
 }
 
-char ParseVariable(){  
+char ParseVariable(){  // V::= a|b|c|...|z
   //printf("entro en parseVar\n");
   char varaux = variable;   
   MatchSymbol(T_VARIABLE);
@@ -121,7 +121,7 @@ int ParseOperator() { // O::= +|-|*|/
 }
 
 
-int ParseParameter(){ //P::=V|E
+int ParseParameter(){ //P::= V | E | N
   //printf("entro en parseVar\n");
 
   if (token == T_VARIABLE){
@@ -136,7 +136,7 @@ int ParseParameter(){ //P::=V|E
     rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER \n");
   }
 }
-int ParseParameterRest(char paramop){ // W::= WP| λ
+int ParseParameterRest(char paramop){ // P_R::= P_R| P
   if (token == T_VARIABLE || token == T_NUMBER || token == '('){
     char paramVarAux = paramop;
     ParseParameter();
@@ -148,7 +148,7 @@ int ParseParameterRest(char paramop){ // W::= WP| λ
   }
 };
 
-int ParseExpression() { // E::= (O P PR)
+int ParseExpression() { // E::= (O P P_R)
   //printf("entro en parseExpresion\n");
 
   if (token == T_NUMBER){
@@ -163,36 +163,32 @@ int ParseExpression() { // E::= (O P PR)
   }
 }
 
-int ParseSentencia(){ // S::= (R)
+int ParseSentencia(){ // S::= (R) | V | N
   if (token == '('){
     ParseLParen();
     ParseRest();
     ParseRParen();
   }
-}
-
-int ParseAxiom() { // A::= S|N|V
-  //printf("entro en parseAxiom\n");
-  if (token == T_NUMBER){
-    int numberPrint = ParseNumber();
-    }
-  else if(token == '('){
-      ParseSentencia();
-  }
   else if(token == T_VARIABLE){
     char paramVarAux = ParseVariable();
     printf("%c ", paramVarAux);
     printf("@ ");
-      
     }
-    else{
-      rd_syntax_error (token, 0, "Token %d was read, but a Number or a Left Parenthesis was expected \n");
-    }
+  else if(token == T_NUMBER){
+    ParseNumber();
+  }
+  else{
+    rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE SENTENCIA \n");
+  }
+}
 
+int ParseAxiom() { // A::= S
+  //printf("entro en parseAxiom\n");
+  ParseSentencia();
 }
 
 
-int ParseRest() { // R::= =VE)|OPP)
+int ParseRest() { // R::= = V S | O P P_R
   // printf("entro en parseRest\n");
   int val;
   char parameter1;
@@ -202,7 +198,6 @@ int ParseRest() { // R::= =VE)|OPP)
     MatchSymbol('=');
     char auxVar = ParseVariable();
     ParseAxiom();
-    
     printf("dup %c ", auxVar);
     printf("! ");
   }
