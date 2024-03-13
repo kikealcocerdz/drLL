@@ -19,6 +19,17 @@ int token_val; // or the arithmetic operator
 int old_token_val = -1;
 // TO DO: Pack these variables in a struct
 
+int ParseNumber();
+char ParseVariable();
+int ParseOperator();
+int ParseParameter();
+int ParseParameterRest(char paramop);
+int ParseExpression();
+int ParseSentencia();
+int ParseAxiom();
+int ParseRest();
+char ask_variables();
+
 int line_counter = 1;
 
 void update_old_token() { // Sometimes we need to check the previous token
@@ -125,7 +136,7 @@ int ParseParameter(){ //P::=V|E
     rd_syntax_error (token, 0, "Token %d was read, but a Variable or an Expression was expected FALLO DE PARAMETER \n");
   }
 }
-int ParseParameterRest(charparamop){ // W::= WP| λ
+int ParseParameterRest(char paramop){ // W::= WP| λ
   if (token == T_VARIABLE || token == T_NUMBER || token == '('){
     char paramVarAux = paramop;
     ParseParameter();
@@ -137,7 +148,7 @@ int ParseParameterRest(charparamop){ // W::= WP| λ
   }
 };
 
-int ParseExpression() { // E::= (OPP)|N
+int ParseExpression() { // E::= (O P PR)
   //printf("entro en parseExpresion\n");
 
   if (token == T_NUMBER){
@@ -152,15 +163,21 @@ int ParseExpression() { // E::= (OPP)|N
   }
 }
 
-int ParseAxiom() { // A::(R|N|V
+int ParseSentencia(){ // S::= (R)
+  if (token == '('){
+    ParseLParen();
+    ParseRest();
+    ParseRParen();
+  }
+}
+
+int ParseAxiom() { // A::= S|N|V
   //printf("entro en parseAxiom\n");
   if (token == T_NUMBER){
     int numberPrint = ParseNumber();
     }
   else if(token == '('){
-      ParseLParen();
-      ParseRest();
-      ParseRParen();
+      ParseSentencia();
   }
   else if(token == T_VARIABLE){
     char paramVarAux = ParseVariable();
@@ -198,17 +215,22 @@ int ParseRest() { // R::= =VE)|OPP)
 }
 
 
-
 int main(int argc, char **argv) {
   // Usage :  drLL -s  ==> evaluate a single Input Line
   //          drLL     ==> evalute multiple Input Lines until some error appears
 
   int flagMultiple = 1;
-
   if (argc >= 2) {
     if (strcmp("-s", argv[1]) == 0) {
       flagMultiple = 0;
     }
+  }
+
+  int userInput;
+  char alfabeto[26]; // Array to store the variables [a-z]
+  for (int i = 0; i < 26; i++) {
+    alfabeto[i] = 'A' + i;
+    printf("VARIABLE %c \n", alfabeto[i]); 
   }
 
   do {
@@ -218,6 +240,5 @@ int main(int argc, char **argv) {
     printf("\n");
     fflush(stdout);
   } while (flagMultiple);
-
   system("PAUSE");
 }
