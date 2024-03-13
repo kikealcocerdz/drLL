@@ -121,9 +121,8 @@ int ParseOperator() { // O::= +|-|*|/
 }
 
 
-int ParseParameter(){ //P::= V | E | N
+int ParseParameter(){ //P::= V | E
   //printf("entro en parseVar\n");
-
   if (token == T_VARIABLE){
     char paramVarAux = ParseVariable();
     printf("%c ", paramVarAux);
