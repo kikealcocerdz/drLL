@@ -100,7 +100,6 @@ void MatchSymbol(int expected_token) {
 
 
 int ParseNumber() { 
-  //printf("entro en parseNum\n");
   int aux = number;  
   printf("%d ", aux);
   MatchSymbol(T_NUMBER);
@@ -108,21 +107,18 @@ int ParseNumber() {
 }
 
 char ParseVariable(){  
-  //printf("entro en parseVar\n");
   char varaux = variable;   
   MatchSymbol(T_VARIABLE);
   return varaux;
 }
 
 int ParseOperator() { // O::= +|-|*|/
-  //printf("entro en parseOper\n");
   MatchSymbol(T_OPERATOR);
   return token_val;
 }
 
 
 int ParseParameter(){ //P::= V|E
-  //printf("entro en parseVar\n");
 
   if (token == T_VARIABLE){
     char paramVarAux = ParseVariable();
@@ -149,7 +145,6 @@ int ParseParameterRest(char paramop){ // W::= PW| λ
 };
 
 int ParseExpression() { // E::= (O P W)|N
-  //printf("entro en parseExpresion\n");
 
   if (token == T_NUMBER){
     ParseNumber();
@@ -172,7 +167,6 @@ int ParseSentencia(){ // S::= (R)
 }
 
 int ParseAxiom() { // A::= S|N|V
-  //printf("entro en parseAxiom\n");
   if (token == T_NUMBER){
     ParseNumber();
     }
@@ -193,12 +187,10 @@ int ParseAxiom() { // A::= S|N|V
 
 
 int ParseRest() { // R::= =VS|OPW
-  // printf("entro en parseRest\n");
   int val;
   char parameter1;
   char parameter2;
   if (token == '='){
-    //printf("entro en if de parseRest\n");
     MatchSymbol('=');
     char auxVar = ParseVariable();
     ParseAxiom();
@@ -207,7 +199,6 @@ int ParseRest() { // R::= =VS|OPW
     printf("! ");
   }
   else{
-    //printf("entro en else de parseRest\n");
     char aux=ParseOperator();
     ParseParameter();
     ParseParameterRest(aux);
